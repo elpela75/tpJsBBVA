@@ -8,24 +8,23 @@
 <dom-module id="wc-login">
   <template>
     <style include="wc-login-style"></style>  
+
     <h2 on-click="toggle">{{mensajeinicial}}</h2>
 
-    <iron-collapse opened="[[desplegado]]">
-        <div class="collapse">
-            <paper-input value={{usuario}} placeholder="usuario"></paper-input>
-            <!--<paper-button raised class="indigo" on-click="cancelar">Borrar...</paper-button>-->
-            <paper-button raised class="indigo" on-click="login">Ver Perfil...</paper-button>
-        </div>
-    </iron-collapse>
-
     <iron-ajax
-      id="ajaxconnect"
-      auto
+      id="ajaxperfil"       
       url="https://techcodewars.herokuapp.com/api/v1/users/[[usuario]]"
       handle-as="json"
       last-response="{{resultado}}"
       loading="{{cargando}}">
     </iron-ajax>
+
+    <iron-collapse opened="[[desplegado]]">
+        <div class="collapse">
+            <paper-input value={{usuario}} placeholder="usuario"></paper-input>
+            <paper-button id="btnLogin" raised class="indigo" on-click="login">Ver Perfil...</paper-button>
+        </div>
+    </iron-collapse>
 
     <paper-spinner class="spinner" active="[[loading]]"></paper-spinner>
 
@@ -38,13 +37,17 @@
       }
       static get properties() {
         return {
-          cargando: Boolean,
+          cargando: {
+            type: Boolean,
+            value: false
+          },
           mensajeinicial: {
             type: String,
             value: 'Hola! (soy el valor por default)'
           },
           usuario: {
-            type: String
+            type: String,
+            value: "elpela75"
           },
           desplegado: {
               type: Boolean,
@@ -58,16 +61,21 @@
       }
 
       toggle() {
-          this.desplegado = !this.desplegado;
+       this.desplegado = !this.desplegado;
       }
 
       cancelar() {
-          this.usuario = "";
-          this.toggle();
+        this.usuario = "";
+        this.toggle();
       }
 
       login() {
-        console.log(this.resultado);
+        if ("" == this.usuario) {
+          alert("Ingresá el usuario...");
+          return;
+        }
+        this.$.ajaxperfil.generateRequest();
+        //console.log(this.$.ajaxperfil.generateRequest().parseResponse());
       }
 
       constructor() {
