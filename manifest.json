@@ -1,0 +1,7 @@
+{
+  "name": "tpjsbbva",
+  "short_name": "tpjsbbva",
+  "description": "Trabajo Práctico JS y Polymer para BBVA",
+  "start_url": "/",
+  "display": "standalone"
+}
