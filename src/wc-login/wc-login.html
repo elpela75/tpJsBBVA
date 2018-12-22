@@ -4,6 +4,7 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="./wc-login-style.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 
 <dom-module id="wc-login">
   <template>
@@ -16,18 +17,20 @@
       url="https://techcodewars.herokuapp.com/api/v1/users/[[usuario]]"
       handle-as="json"
       last-response="{{resultado}}"
-      loading="{{cargando}}">
+      loading="{{cargando}}"
+      on-response="respuestaRecibidaDeCodeWars"
+      on-error="errorRecibidoDeCodeWars">
     </iron-ajax>
 
     <iron-collapse opened="[[desplegado]]">
         <div class="collapse">
             <paper-input value={{usuario}} placeholder="usuario"></paper-input>
             <paper-button id="btnLogin" raised class="indigo" on-click="login">Ver Perfil...</paper-button>
-        </div>
+            <!--<paper-input value={{resultado.name}}></paper-input>-->
+          </div>
     </iron-collapse>
 
-    <paper-spinner class="spinner" active="[[loading]]"></paper-spinner>
-
+    <paper-spinner class="spinner" alt="Cargando datos..." active="[[cargando]]"></paper-spinner>
   </template>
 
   <script>
@@ -38,8 +41,7 @@
       static get properties() {
         return {
           cargando: {
-            type: Boolean,
-            value: false
+            type: Boolean
           },
           mensajeinicial: {
             type: String,
@@ -47,7 +49,7 @@
           },
           usuario: {
             type: String,
-            value: "elpela75"
+            value: ""
           },
           desplegado: {
               type: Boolean,
@@ -75,22 +77,34 @@
           return;
         }
         this.$.ajaxperfil.generateRequest();
-        //console.log(this.$.ajaxperfil.generateRequest().parseResponse());
+      }
+
+      respuestaRecibidaDeCodeWars (e, request) {
+        if(request.succeeded) {
+          this.resultado = request.response;
+          console.log(this.resultado, request.status);
+        } else {
+          console.info('la solicitud nos ofreció resultados incorrectos, con código ' + request.status);
+        }
+      }
+
+      errorRecibidoDeCodeWars (e, error) {
+        console.log(error.request, error.request.status); //ese es el iron-request de la solicitud
       }
 
       constructor() {
         super();
-        console.log('construyo el webcomponente wc-login.html');
+        //console.log('construyo el webcomponente wc-login.html');
       }
 
       connectedCallback() {
         super.connectedCallback();
-        console.log('paso por el connectedCallback() del webcomponente wc-login.html');
+        //console.log('paso por el connectedCallback() del webcomponente wc-login.html');
       }
 
       disconnectedCallback() {
         super.disconnectedCallback();
-        console.log('paso por el disconnectedCallback() del webcomponente wc-login.html');
+        //console.log('paso por el disconnectedCallback() del webcomponente wc-login.html');
       }
 
       attributeChangedCallback(nombre, valorAnterior, valorNuevo) {
@@ -100,7 +114,7 @@
 
       ready() {
         super.ready();
-        console.log('Ejecutándose ready del webcomponente wc-login.html');
+        //console.log('Ejecutándose ready del webcomponente wc-login.html');
       }
 
     }
