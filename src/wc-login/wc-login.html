@@ -10,7 +10,7 @@
   <template>
     <style include="wc-login-style"></style>  
 
-    <h2 on-click="toggle">{{mensajeinicial}}</h2>
+    <h2 on-click="_toggle">{{mensajeinicial}}</h2>
 
     <iron-ajax
       id="ajaxperfil"       
@@ -18,16 +18,15 @@
       handle-as="json"
       last-response="{{resultado}}"
       loading="{{cargando}}"
-      on-response="respuestaRecibidaDeCodeWars"
-      on-error="errorRecibidoDeCodeWars">
+      on-response="_respuestaRecibidaDeCodeWars"
+      on-error="_errorRecibidoDeCodeWars">
     </iron-ajax>
 
-    <iron-collapse opened="[[desplegado]]">
+    <iron-collapse id="ironCollapseLogin" opened="{{desplegado}}">
         <div class="collapse">
-            <paper-input value={{usuario}} placeholder="usuario"></paper-input>
-            <paper-button id="btnLogin" raised class="indigo" on-click="login">Ver Perfil...</paper-button>
-            <!--<paper-input value={{resultado.name}}></paper-input>-->
-          </div>
+            <paper-input id="inputUsuario" label="usuario" value={{usuario}} ></paper-input>
+            <paper-button id="btnLogin" raised class="indigo" on-click="_login">Traer Datos...</paper-button>
+        </div>
     </iron-collapse>
 
     <paper-spinner class="spinner" alt="Cargando datos..." active="[[cargando]]"></paper-spinner>
@@ -53,7 +52,8 @@
           },
           desplegado: {
               type: Boolean,
-              value: false
+              value: false,
+              observer: '_changeCollapse'
           },
           resultado: {
             type: Object,
@@ -62,16 +62,33 @@
         };
       }
 
-      toggle() {
-       this.desplegado = !this.desplegado;
+      _changeCollapse(valorNuevo, valorAnterior) {
+        if (this.desplegado) {
+          this.$.inputUsuario.focus();
+        }
+        this.dispatchEvent(new CustomEvent('change-collapse', {
+            detail: {
+              collapse: this.desplegado
+            },
+            bubbles: true,
+            composed: true
+        }));
       }
 
-      cancelar() {
+      _toggle() {
+       this.desplegado = !this.desplegado;
+       if (!this.desplegado) {
+         this.usuario = '';
+         this.resultado = {};
+       }
+      }
+
+      _cancelar() {
         this.usuario = "";
         this.toggle();
       }
 
-      login() {
+      _login() {
         if ("" == this.usuario) {
           alert("Ingresá el usuario...");
           return;
@@ -79,42 +96,71 @@
         this.$.ajaxperfil.generateRequest();
       }
 
-      respuestaRecibidaDeCodeWars (e, request) {
-        if(request.succeeded) {
-          this.resultado = request.response;
-          console.log(this.resultado, request.status);
+      _respuestaRecibidaDeCodeWars (e, request) {
+        this.resultado = request;
+        if(this.resultado.succeeded) {
+          this.dispatchEvent(new CustomEvent('succed-connect-api', {
+            detail: {
+              codigo: 0,
+              msg: "Conexión exitosa!",
+              resultado: this.resultado.response
+            },
+            bubbles: true,
+            composed: true
+          }));
         } else {
-          console.info('la solicitud nos ofreció resultados incorrectos, con código ' + request.status);
+          this.dispatchEvent(new CustomEvent('not-succed-connect-api', {
+            detail: {
+              codigo: this.resultado.status,
+              msg: "Los resultados de conexión obtenidos son incorrectos.",
+              resultado: {}
+            },
+            bubbles: true,
+            composed: true
+          }));
         }
       }
 
-      errorRecibidoDeCodeWars (e, error) {
-        console.log(error.request, error.request.status); //ese es el iron-request de la solicitud
+      _errorRecibidoDeCodeWars (e, error) {
+        this.resultado = error;
+        this.dispatchEvent(new CustomEvent('error-connect-api', {
+            detail: {
+              codigo: -1,   //codigo: this.resultado.request.status;
+              msg: "Error de conexión con la API de CodWars",
+              resultado: {}
+            },
+            bubbles: true,
+            composed: true
+          }));
       }
 
       constructor() {
         super();
-        //console.log('construyo el webcomponente wc-login.html');
       }
 
       connectedCallback() {
         super.connectedCallback();
-        //console.log('paso por el connectedCallback() del webcomponente wc-login.html');
+        this.$.inputUsuario.addEventListener('keypress', (e)=>{
+          if (13 == e.keyCode) {
+            this._login();
+          }
+        });
+        this.$.ironCollapseLogin.addEventListener('transitioning-changed',this._changeCollapse);
       }
 
       disconnectedCallback() {
         super.disconnectedCallback();
-        //console.log('paso por el disconnectedCallback() del webcomponente wc-login.html');
+        this.$.inputUsuario.removeEventListener('keypress');
+        this.$.ironCollapseLogin.removeEventListener('transitioning-changed',this._changeCollapse);
       }
 
-      attributeChangedCallback(nombre, valorAnterior, valorNuevo) {
-        super.attributeChangedCallback();
-        console.log('Ejecutándose attributeChangedCallback del webcomponente wc-login.html', nombre, valorAnterior, valorNuevo);
-      }
+      //attributeChangedCallback(nombre, valorAnterior, valorNuevo) {
+        //super.attributeChangedCallback();
+        //console.log('Ejecutándose attributeChangedCallback del webcomponente wc-login.html', nombre, valorAnterior, valorNuevo);
+      //}
 
       ready() {
         super.ready();
-        //console.log('Ejecutándose ready del webcomponente wc-login.html');
       }
 
     }

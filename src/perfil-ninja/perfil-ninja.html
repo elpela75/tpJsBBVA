@@ -1,0 +1,78 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../perfil-ninja/perfil-ninja-style.html">
+<link rel="import" href="../perfil-ninja/perfil-ninja-katas.html">
+
+<dom-module id="perfil-ninja">
+    <template>
+        <style include="perfil-ninja-style"></style>
+
+        <h2>Perfil del Ninja:<span> [[jsonPerfil.name]]</span></h2>
+
+        <p class="rotulo">Clan: <span class="detalle-item">[[jsonPerfil.clan]]</span></p>
+
+        <p class="rotulo">Retos: 
+            <ul>
+                <li class="rotulo-detalle">De su autoría: <span class="detalle-item">[[jsonPerfil.codeChallenges.totalAuthored]]</span></li>
+                <li class="rotulo-detalle">Realizados: <span class="detalle-item">[[jsonPerfil.codeChallenges.totalCompleted]]</span></li>
+            </ul>
+        </p>
+
+        <p class="rotulo">Honor: <span class="detalle-item">[[jsonPerfil.honor]]</span></p>
+
+        <p class="rotulo">Posición Gral.: <span class="detalle-item">[[jsonPerfil.leaderboardPosition]]</span></p>
+
+        <p class="rotulo">Rankings: 
+            <ul>
+                <li class="rotulo-detalle">Lenguajes: <span class="detalle-item">[[jsonPerfil.ranks.languages]]</span></li>
+                <li class="rotulo-detalle">En Gral.: 
+                    <ul>
+                        <li class="rotulo-detalle">Ranking: <span class="detalle-item">[[jsonPerfil.ranks.overall.rank]]</span></li>
+                        <li class="rotulo-detalle">Nivel: <span class="detalle-item">[[jsonPerfil.ranks.overall.name]]</span></li>
+                        <li class="rotulo-detalle">Color: <span class="detalle-item">[[jsonPerfil.ranks.overall.color]]</span></li>
+                        <li class="rotulo-detalle">Score: <span class="detalle-item">[[jsonPerfil.ranks.overall.score]]</span></li>
+                    </ul>
+                </li>
+            </ul>
+        </p>
+
+        <p class="rotulo">Skills: </p>
+        <ul>
+            <template is="dom-repeat" items="[[jsonPerfil.skills]]">
+                    <li><span class="detalle-item">[[item]]</span></li>
+            </template>
+        </ul>
+
+        <perfil-ninja-katas saludo="Ultimos Katas Realizados..."></perfil-ninja-katas>
+
+    </template>
+
+    <script>
+        class PerfilNinja extends Polymer.Element {
+            static get is() {
+                return 'perfil-ninja';
+            }
+
+            static get properties() {
+                return {
+                    jsonPerfil: {
+                        type: Object,
+                        value: {}
+                    },
+                    retos: {
+                        type: Array,
+                        values: function() {
+                            return [];
+                        }
+                    }
+                };
+            }
+            
+            ready() {
+                super.ready();
+                this.set('retos',this.jsonPerfil.codeChallenges);
+            }  
+        }
+
+        window.customElements.define(PerfilNinja.is, PerfilNinja);
+    </script>
+</dom-module>

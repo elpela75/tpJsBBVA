@@ -1,0 +1,40 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../perfil-ninja/perfil-ninja-katas-style.html">
+
+<dom-module id="perfil-ninja-katas">
+    <template>
+        <style include="perfil-ninja-katas-style"></style>
+
+        <h3>[[saludo]]</h3>
+
+    </template>
+
+    <script>
+        class PerfilNinjaKatas extends Polymer.Element {
+            static get is() {
+                return 'perfil-ninja-katas';
+            }
+
+            static get properties() {
+                return {
+                    saludo: {
+                        type: String,
+                        value: 'Hola!!!'
+                    }
+                    
+                };
+            }
+
+            constructor() {
+                super();
+            }
+
+            ready() {
+                super.ready();
+            }
+
+        }
+
+        window.customElements.define(PerfilNinjaKatas.is, PerfilNinjaKatas);
+    </script>
+</dom-module>

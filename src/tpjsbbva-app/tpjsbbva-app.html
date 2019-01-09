@@ -1,5 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../wc-login/wc-login.html">
+<link rel="import" href="../perfil-ninja/perfil-ninja.html">
+<link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
 
 <dom-module id="tpjsbbva-app">
   <template>
@@ -8,10 +10,33 @@
         display: block;
       }
       
+      .collapse {
+                padding: 15px;
+                border: 1px solid #5d1e75;
+                border-radius: 20px;
+      }
     </style>
 
-    <wc-login id="login" mensajeinicial="[[is]]Ninja Perfil Preview... (click)"></wc-login>
+    <!-- WebComponente de Conexion a la API de Codwars -->
+    <wc-login 
+      id="login" 
+      mensajeinicial="[[is]]Ninja Perfil Preview... (click)"
+      on-succed-connect-api="_connectCodWars"
+      on-not-succed-connect-api="_connectErrorCodWars"
+      on-error-connect-api="_errorConnect"
+      on-change-collapse="_changeCollapse"
+    ></wc-login>
     
+    <!-- Luego de conectarme, si corresponde, muestro los datos del perfil del usuario -->
+    <iron-collapse opened="[[mostrarPerfil]]">
+      <div class="collapse">
+        <perfil-ninja 
+          json-perfil="[[jsonDelPerfil]]"
+        ></perfil-ninja>
+      </div>
+    </iron-collapse>
+    
+
   </template>
 
   <script>
@@ -26,34 +51,75 @@
           appname: {
             type: String,
             value: 'tpjsbbva-app'
+          },
+          mostrarPerfil: {
+            type: Boolean,
+            value: false
+          },
+          jsonDelPerfil: {
+            type: Object,
+            value: {}
           }
         };
       }
 
-      constructor() {
-        super();
-        //console.log('construyo el webcomponente tpjsbbva-pelado.html');
+      _connectCodWars(e) {
+        if (false == e.detail.resultado.success) {
+          if (this.mostrarPerfil) {
+            this._toggle();
+          }
+          alert('NO SE ENCONTRO EL USUARIO ESPECIFICADO!!!');
+          this.$.login.focus();
+        } else {
+          if (!this.mostrarPerfil) {
+            this._toggle();
+          }
+          this.set('jsonDelPerfil',e.detail.resultado);
+          
+          console.log(this.jsonDelPerfil);
+        }
       }
 
-      connectedCallback() {
-        super.connectedCallback();
-        //console.log('paso por el connectedCallback() del webcomponente tpjsbbva-pelado.html');
-      }
-
-      disconnectedCallback() {
-        super.disconnectedCallback();
-        //console.log('paso por el disconnectedCallback() del webcomponente tpjsbbva-pelado.html');
-      }
-
-      attributeChangedCallback(nombre, valorAnterior, valorNuevo) {
-        super.attributeChangedCallback();
-        //console.log('Ejecutándose attributeChangedCallback del webcomponente tpjsbbva-pelado.html ', nombre, valorAnterior, valorNuevo);
+      _connectErrorCodWars(e) {
+        console.log(e.detail);
       }
       
-      ready() {
-        super.ready();
+      _errorConnect(e) {
+        console.log(e.detail);
+      }
+
+      _toggle() {
+        this.mostrarPerfil = !this.mostrarPerfil;
+      }
+
+      _changeCollapse() {
+        this.mostrarPerfil = false;
+      }
+
+      //constructor() {
+        //super();
+        //console.log('construyo el webcomponente tpjsbbva-pelado.html');
+      //}
+
+      //connectedCallback() {
+        //super.connectedCallback();
+        //console.log('paso por el connectedCallback() del webcomponente tpjsbbva-pelado.html');
+      //}
+
+      //disconnectedCallback() {
+        //super.disconnectedCallback();
+        //console.log('paso por el disconnectedCallback() del webcomponente tpjsbbva-pelado.html');
+      //}
+
+      //attributeChangedCallback(nombre, valorAnterior, valorNuevo) {
+        //super.attributeChangedCallback();
+        //console.log('Ejecutándose attributeChangedCallback del webcomponente tpjsbbva-pelado.html ', nombre, valorAnterior, valorNuevo);
+      //}
+      
+      //ready() {
+        //super.ready();
         //console.log('Ejecutándose ready del webcomponent tpjsbbva-pelado.html');
-      }    
+      //}    
       
     }
 
