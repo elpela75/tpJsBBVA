@@ -8,34 +8,36 @@
 
 <dom-module id="wc-login">
   <template>
-    <style include="wc-login-style"></style>  
+    <style include="wc-login-style"></style>
 
     <h2 on-click="_toggle">{{mensajeinicial}}</h2>
 
-    <iron-ajax
-      id="ajaxperfil"       
-      url="https://techcodewars.herokuapp.com/api/v1/users/[[usuario]]"
+    <iron-ajax 
+      id="ajaxperfil" 
+      url="https://techcodewars.herokuapp.com/api/v1/users/[[usuario]]" 
       handle-as="json"
-      last-response="{{resultado}}"
-      loading="{{cargando}}"
-      on-response="_respuestaRecibidaDeCodeWars"
+      last-response="{{resultado}}" 
+      loading="{{cargando}}" 
+      on-response="_respuestaRecibidaDeCodeWars" 
       on-error="_errorRecibidoDeCodeWars">
     </iron-ajax>
 
-    <iron-collapse id="ironCollapseLogin" opened="{{desplegado}}">
+    <form id="miForm">
+      <iron-collapse id="ironCollapseLogin" opened="{{desplegado}}">
         <div class="collapse">
-            <paper-input id="inputUsuario" label="usuario" value={{usuario}} ></paper-input>
-            <paper-button id="btnLogin" raised class="indigo" on-click="_login">Traer Datos...</paper-button>
+          <paper-input id="inputUsuario" label="usuario" value={{usuario}}></paper-input>
+          <paper-button id="btnLogin" raised class="indigo" on-click="_login">Traer Datos...</paper-button>
         </div>
-    </iron-collapse>
+      </iron-collapse>
+    </form>
 
     <paper-spinner class="spinner" alt="Cargando datos..." active="[[cargando]]"></paper-spinner>
   </template>
 
   <script>
     class WcLogin extends Polymer.Element {
-      static get is() { 
-        return 'wc-login'; 
+      static get is() {
+        return 'wc-login';
       }
       static get properties() {
         return {
@@ -51,9 +53,9 @@
             value: ""
           },
           desplegado: {
-              type: Boolean,
-              value: false,
-              observer: '_changeCollapse'
+            type: Boolean,
+            value: false,
+            observer: '_changeCollapse'
           },
           resultado: {
             type: Object,
@@ -67,20 +69,20 @@
           this.$.inputUsuario.focus();
         }
         this.dispatchEvent(new CustomEvent('change-collapse', {
-            detail: {
-              collapse: this.desplegado
-            },
-            bubbles: true,
-            composed: true
+          detail: {
+            collapse: this.desplegado
+          },
+          bubbles: true,
+          composed: true
         }));
       }
 
       _toggle() {
-       this.desplegado = !this.desplegado;
-       if (!this.desplegado) {
-         this.usuario = '';
-         this.resultado = {};
-       }
+        this.desplegado = !this.desplegado;
+        if (!this.desplegado) {
+          this.usuario = '';
+          this.resultado = {};
+        }
       }
 
       _cancelar() {
@@ -96,9 +98,9 @@
         this.$.ajaxperfil.generateRequest();
       }
 
-      _respuestaRecibidaDeCodeWars (e, request) {
+      _respuestaRecibidaDeCodeWars(e, request) {
         this.resultado = request;
-        if(this.resultado.succeeded) {
+        if (this.resultado.succeeded) {
           this.dispatchEvent(new CustomEvent('succed-connect-api', {
             detail: {
               codigo: 0,
@@ -121,17 +123,17 @@
         }
       }
 
-      _errorRecibidoDeCodeWars (e, error) {
+      _errorRecibidoDeCodeWars(e, error) {
         this.resultado = error;
         this.dispatchEvent(new CustomEvent('error-connect-api', {
-            detail: {
-              codigo: -1,   //codigo: this.resultado.request.status;
-              msg: "Error de conexión con la API de CodWars",
-              resultado: {}
-            },
-            bubbles: true,
-            composed: true
-          }));
+          detail: {
+            codigo: -1, //codigo: this.resultado.request.status;
+            msg: "Error de conexión con la API de CodWars",
+            resultado: {}
+          },
+          bubbles: true,
+          composed: true
+        }));
       }
 
       constructor() {
@@ -140,27 +142,18 @@
 
       connectedCallback() {
         super.connectedCallback();
-        this.$.inputUsuario.addEventListener('keypress', (e)=>{
+        this.$.inputUsuario.addEventListener('keypress', (e) => {
           if (13 == e.keyCode) {
             this._login();
           }
         });
-        this.$.ironCollapseLogin.addEventListener('transitioning-changed',this._changeCollapse);
+        this.$.ironCollapseLogin.addEventListener('transitioning-changed', this._changeCollapse);
       }
 
       disconnectedCallback() {
         super.disconnectedCallback();
         this.$.inputUsuario.removeEventListener('keypress');
-        this.$.ironCollapseLogin.removeEventListener('transitioning-changed',this._changeCollapse);
-      }
-
-      //attributeChangedCallback(nombre, valorAnterior, valorNuevo) {
-        //super.attributeChangedCallback();
-        //console.log('Ejecutándose attributeChangedCallback del webcomponente wc-login.html', nombre, valorAnterior, valorNuevo);
-      //}
-
-      ready() {
-        super.ready();
+        this.$.ironCollapseLogin.removeEventListener('transitioning-changed', this._changeCollapse);
       }
 
     }

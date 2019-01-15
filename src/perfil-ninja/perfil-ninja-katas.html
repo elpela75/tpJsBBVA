@@ -1,11 +1,47 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../perfil-ninja/perfil-ninja-katas-style.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
 
 <dom-module id="perfil-ninja-katas">
     <template>
         <style include="perfil-ninja-katas-style"></style>
 
-        <h3>[[saludo]]</h3>
+        <iron-ajax 
+            id="ajaxninjakatas" 
+            url="https://techcodewars.herokuapp.com/api/v1/users/[[usuario]]/code-challenges/completed?page=0"
+            loading="{{cargando}}" 
+            handle-as="json" 
+            last-response="{{respuesta}}" 
+            on-response="_rtaCargaDeKatas"
+            on-error="_errorRtaCargaDeKatas"
+        ></iron-ajax>
+
+        <paper-spinner class="spinner" alt="Cargando datos..." active="[[cargando]]"></paper-spinner>
+
+        <h3>[[titulo]]</h3>
+        <paper-input 
+            id="filtro" 
+            char-counter name="filtro" 
+            label="filtrar por lenguaje" 
+            required on-value-changed='_filtrarLenguaje'
+        ></paper-input>
+
+        <table>
+            <tr>
+                <th>Kata</th>
+                <th>Lenguajes</th>
+                <th>Fecha</th>
+            </tr>
+            <template is="dom-repeat" items="[[katas]]">
+                <tr>
+                    <td><span class="detalle-item">[[item.name]]</span></td>
+                    <td><span class="detalle-item">[[item.completedLanguages]]</span></td>
+                    <td><span class="detalle-item">[[item.completedAt]]</span></td>
+                </tr>
+            </template>
+        </table>
 
     </template>
 
@@ -17,16 +53,69 @@
 
             static get properties() {
                 return {
-                    saludo: {
+                    titulo: {
                         type: String,
-                        value: 'Hola!!!'
+                        value: 'Katas!!!'
+                    },
+                    usuario: {
+                        type: String,
+                        value: '',
+                        observer: '_buscarKatas'
+                    },
+                    respuesta: {
+                        type: Object,
+                        value: {},
+                        notify: true
+                    },
+                    katas: {
+                        type: Array
+                    },
+                    cargando: {
+                        type: Boolean,
+                        value: false
+                    },
+                    cantKatasMax: {
+                        type: Number,
+                        value: 5
                     }
-                    
                 };
+            }
+
+            //[[item.completedAt]]
+            //toISOString().slice(0,10)
+            //toISOString().slice(11,16)
+
+            _rtaCargaDeKatas(e, request) {
+                this.katas = this.respuesta.data.slice(0, this.cantKatasMax);
+            }
+
+            _errorRtaCargaDeKatas() {
+                console.error("hubo un error!!!");
+            }
+
+            _buscarKatas() {
+                return this.usuario && this.$.ajaxninjakatas.generateRequest();
+            }
+
+            _filtrarLenguaje(e) {
+                if (!this.respuesta.data) {
+                    return;
+                }
+                let filtered = this.respuesta.data.filter(function (item) {
+                    let str = item.completedLanguages.toString();
+                    let rgxp = new RegExp(e.detail.value, "gi");
+                    return Array.isArray(str.match(rgxp)) && str.match(rgxp).length > 0
+                });
+                this.katas = filtered.slice(0, this.cantKatasMax);
             }
 
             constructor() {
                 super();
+            }
+
+            connectedCallback() {
+                super.connectedCallback();
+
             }
 
             ready() {

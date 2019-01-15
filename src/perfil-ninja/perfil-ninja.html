@@ -10,7 +10,7 @@
 
         <p class="rotulo">Clan: <span class="detalle-item">[[jsonPerfil.clan]]</span></p>
 
-        <p class="rotulo">Retos: 
+        <p class="rotulo">Retos:
             <ul>
                 <li class="rotulo-detalle">De su autoría: <span class="detalle-item">[[jsonPerfil.codeChallenges.totalAuthored]]</span></li>
                 <li class="rotulo-detalle">Realizados: <span class="detalle-item">[[jsonPerfil.codeChallenges.totalCompleted]]</span></li>
@@ -21,10 +21,16 @@
 
         <p class="rotulo">Posición Gral.: <span class="detalle-item">[[jsonPerfil.leaderboardPosition]]</span></p>
 
-        <p class="rotulo">Rankings: 
+        <p class="rotulo">Rankings:
             <ul>
-                <li class="rotulo-detalle">Lenguajes: <span class="detalle-item">[[jsonPerfil.ranks.languages]]</span></li>
-                <li class="rotulo-detalle">En Gral.: 
+                <li class="rotulo-detalle">Lenguajes:
+                    <ul>
+                        <template is="dom-repeat" items="[[lenguajes]]">
+                            <li class="detalle-item">[[item]]</li>
+                        </template>
+                    </ul>
+                </li>
+                <li class="rotulo-detalle">En Gral.:
                     <ul>
                         <li class="rotulo-detalle">Ranking: <span class="detalle-item">[[jsonPerfil.ranks.overall.rank]]</span></li>
                         <li class="rotulo-detalle">Nivel: <span class="detalle-item">[[jsonPerfil.ranks.overall.name]]</span></li>
@@ -38,11 +44,11 @@
         <p class="rotulo">Skills: </p>
         <ul>
             <template is="dom-repeat" items="[[jsonPerfil.skills]]">
-                    <li><span class="detalle-item">[[item]]</span></li>
+                <li><span class="detalle-item">[[item]]</span></li>
             </template>
         </ul>
 
-        <perfil-ninja-katas saludo="Ultimos Katas Realizados..."></perfil-ninja-katas>
+        <perfil-ninja-katas titulo="Ultimos Katas Realizados..." usuario="[[jsonPerfil.username]]"></perfil-ninja-katas>
 
     </template>
 
@@ -58,19 +64,20 @@
                         type: Object,
                         value: {}
                     },
-                    retos: {
+                    lenguajes: {
                         type: Array,
-                        values: function() {
-                            return [];
-                        }
+                        computed: '_cargarLenguajes(jsonPerfil.ranks.languages)'
                     }
                 };
             }
-            
+
             ready() {
                 super.ready();
-                this.set('retos',this.jsonPerfil.codeChallenges);
-            }  
+            }
+
+            _cargarLenguajes(obejota) {
+                return obejota && Object.keys(obejota);
+            }
         }
 
         window.customElements.define(PerfilNinja.is, PerfilNinja);
