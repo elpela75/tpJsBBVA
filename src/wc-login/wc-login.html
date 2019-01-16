@@ -50,7 +50,7 @@
           },
           usuario: {
             type: String,
-            value: ""
+            value: ''
           },
           desplegado: {
             type: Boolean,
@@ -58,8 +58,7 @@
             observer: '_changeCollapse'
           },
           resultado: {
-            type: Object,
-            notify: true
+            type: Object
           }
         };
       }
@@ -83,11 +82,6 @@
           this.usuario = '';
           this.resultado = {};
         }
-      }
-
-      _cancelar() {
-        this.usuario = "";
-        this.toggle();
       }
 
       _login() {
@@ -134,10 +128,6 @@
           bubbles: true,
           composed: true
         }));
-      }
-
-      constructor() {
-        super();
       }
 
       connectedCallback() {

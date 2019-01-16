@@ -29,18 +29,22 @@
         ></paper-input>
 
         <table>
-            <tr>
-                <th>Kata</th>
-                <th>Lenguajes</th>
-                <th>Fecha</th>
-            </tr>
-            <template is="dom-repeat" items="[[katas]]">
+            <thead>
                 <tr>
-                    <td><span class="detalle-item">[[item.name]]</span></td>
-                    <td><span class="detalle-item">[[item.completedLanguages]]</span></td>
-                    <td><span class="detalle-item">[[item.completedAt]]</span></td>
+                    <th>Kata</th>
+                    <th>Lenguajes</th>
+                    <th>Fecha</th>
                 </tr>
-            </template>
+            </thead>
+            <tbody>
+                <template is="dom-repeat" items="[[katas]]">
+                    <tr>
+                        <td><span class="detalle-item">[[item.name]]</span></td>
+                        <td><span class="detalle-item">[[item.completedLanguages]]</span></td>
+                        <td><span class="detalle-item">[[item.completedAt]]</span></td>
+                    </tr>
+                </template>
+            </tbody>
         </table>
 
     </template>
@@ -81,8 +85,6 @@
                 };
             }
 
-            
-
             _rtaCargaDeKatas(e, request) {
                 this.katas = this.respuesta.data.slice(0, this.cantKatasMax);
                 for (let i=0; i < this.katas.length; i++) {
@@ -110,20 +112,6 @@
                 });
                 this.katas = filtered.slice(0, this.cantKatasMax);
             }
-
-            constructor() {
-                super();
-            }
-
-            connectedCallback() {
-                super.connectedCallback();
-
-            }
-
-            ready() {
-                super.ready();
-            }
-
         }
 
         window.customElements.define(PerfilNinjaKatas.is, PerfilNinjaKatas);
