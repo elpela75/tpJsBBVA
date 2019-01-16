@@ -81,12 +81,14 @@
                 };
             }
 
-            //[[item.completedAt]]
-            //toISOString().slice(0,10)
-            //toISOString().slice(11,16)
+            
 
             _rtaCargaDeKatas(e, request) {
                 this.katas = this.respuesta.data.slice(0, this.cantKatasMax);
+                for (let i=0; i < this.katas.length; i++) {
+                    let d = new Date(this.katas[i].completedAt);
+                    this.katas[i].completedAt = d.toISOString().slice(0,10) + ' ' + d.toISOString().slice(11,19);
+                }
             }
 
             _errorRtaCargaDeKatas() {
